@@ -19,24 +19,24 @@
 
 package net.ccbluex.liquidbounce.injection.mixins.minecraft.entity;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.ccbluex.liquidbounce.event.EventManager;
 import net.ccbluex.liquidbounce.event.events.PlayerJumpEvent;
 import net.ccbluex.liquidbounce.event.events.PlayerSafeWalkEvent;
 import net.ccbluex.liquidbounce.event.events.PlayerStrideEvent;
+import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleCriticals;
 import net.ccbluex.liquidbounce.features.module.modules.combat.ModuleKeepSprint;
 import net.ccbluex.liquidbounce.features.module.modules.exploit.ModuleAntiReducedDebugInfo;
 import net.ccbluex.liquidbounce.features.module.modules.movement.ModuleNoClip;
+import net.ccbluex.liquidbounce.features.module.modules.player.nofall.ModuleNoFall;
+import net.ccbluex.liquidbounce.features.module.modules.player.nofall.modes.NoFallNoGround;
 import net.ccbluex.liquidbounce.features.module.modules.render.ModuleRotations;
 import net.ccbluex.liquidbounce.features.module.modules.world.ModuleNoSlowBreak;
 import net.ccbluex.liquidbounce.utils.aiming.AimPlan;
 import net.ccbluex.liquidbounce.utils.aiming.Rotation;
 import net.ccbluex.liquidbounce.utils.aiming.RotationManager;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
@@ -119,38 +119,46 @@ public abstract class MixinPlayerEntity extends MixinLivingEntity {
         }
     }
 
-    @Redirect(method = "getBlockBreakingSpeed", at = @At(value = "INVOKE",
+    @ModifyExpressionValue(method = "getBlockBreakingSpeed", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/entity/player/PlayerEntity;hasStatusEffect(Lnet/minecraft/entity/effect/StatusEffect;)Z"))
-    private boolean injectFatigueNoSlow(PlayerEntity instance, StatusEffect statusEffect) {
+    private boolean injectFatigueNoSlow(boolean original) {
         ModuleNoSlowBreak module = ModuleNoSlowBreak.INSTANCE;
-        if ((Object) this == MinecraftClient.getInstance().player &&
-                module.getEnabled() && module.getMiningFatigue() && statusEffect == StatusEffects.MINING_FATIGUE) {
+        if ((Object) this == MinecraftClient.getInstance().player && module.getEnabled() && module.getMiningFatigue()) {
             return false;
         }
 
-        return instance.hasStatusEffect(statusEffect);
+        return original;
     }
 
-    @Redirect(method = "getBlockBreakingSpeed", at = @At(value = "INVOKE",
+    @ModifyExpressionValue(method = "getBlockBreakingSpeed", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/entity/player/PlayerEntity;isSubmergedIn(Lnet/minecraft/registry/tag/TagKey;)Z"))
-    private boolean injectWaterNoSlow(PlayerEntity instance, TagKey tagKey) {
+    private boolean injectWaterNoSlow(boolean original) {
         ModuleNoSlowBreak module = ModuleNoSlowBreak.INSTANCE;
-        if ((Object) this == MinecraftClient.getInstance().player && tagKey == FluidTags.WATER &&
-                module.getEnabled() && module.getWater()) {
+        if ((Object) this == MinecraftClient.getInstance().player && module.getEnabled() && module.getWater()) {
             return false;
         }
 
-        return instance.isSubmergedIn(tagKey);
+        return original;
     }
 
     @Redirect(method = "getBlockBreakingSpeed", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/entity/player/PlayerEntity;isOnGround()Z"))
     private boolean injectOnAirNoSlow(PlayerEntity instance) {
-        ModuleNoSlowBreak module = ModuleNoSlowBreak.INSTANCE;
-        if ((Object) this == MinecraftClient.getInstance().player &&
-                module.getEnabled() && module.getOnAir()) {
-            return true;
+        if ((Object) this == MinecraftClient.getInstance().player) {
+
+            if (ModuleNoSlowBreak.INSTANCE.getEnabled() && ModuleNoSlowBreak.INSTANCE.getOnAir()){
+                return true;
+            }
+
+            if (ModuleNoFall.INSTANCE.getEnabled() && NoFallNoGround.INSTANCE.isActive()) {
+                return false;
+            }
+
+            if (ModuleCriticals.INSTANCE.getEnabled() && ModuleCriticals.NoGroundCrit.INSTANCE.isActive()) {
+                return false;
+            }
         }
+
 
         return instance.isOnGround();
     }

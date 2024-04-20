@@ -23,7 +23,7 @@ import net.ccbluex.liquidbounce.features.module.modules.player.invcleaner.ItemSl
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.utils.client.player
 import net.ccbluex.liquidbounce.utils.client.regular
-import net.minecraft.client.MinecraftClient
+import net.ccbluex.liquidbounce.utils.inventory.ALL_SLOTS_IN_INVENTORY
 import net.minecraft.command.argument.ItemStackArgument
 import net.minecraft.command.argument.ItemStringReader
 import net.minecraft.enchantment.Enchantment
@@ -125,7 +125,7 @@ val ToolItem.type: Int
 
 val Item.attackDamage: Float
     get() = when (this) {
-        is SwordItem -> this.attackDamage
+        is SwordItem -> this.attackDamage + 1.0f
         is MiningToolItem -> this.attackDamage + 1.0f
         is ToolItem -> this.material.attackDamage
         else -> 1.0f

@@ -32,7 +32,7 @@ val ALL_EVENT_CLASSES: Array<KClass<out Event>> = arrayOf(
     BlockChangeEvent::class,
     ChunkLoadEvent::class,
     ChunkUnloadEvent::class,
-    WorldDisconnectEvent::class,
+    DisconnectEvent::class,
     GameRenderEvent::class,
     WorldRenderEvent::class,
     OverlayRenderEvent::class,
@@ -71,6 +71,7 @@ val ALL_EVENT_CLASSES: Array<KClass<out Event>> = arrayOf(
     PlayerJumpEvent::class,
     PlayerAfterJumpEvent::class,
     PlayerUseMultiplier::class,
+    PlayerInteractedItem::class,
     PlayerVelocityStrafe::class,
     PlayerStrideEvent::class,
     PlayerSafeWalkEvent::class,
@@ -90,7 +91,9 @@ val ALL_EVENT_CLASSES: Array<KClass<out Event>> = arrayOf(
     ClientChatErrorEvent::class,
     ClientChatJwtTokenEvent::class,
     WorldChangeEvent::class,
-    AltManagerUpdateEvent::class,
+    AccountManagerMessageEvent::class,
+    AccountManagerAdditionResultEvent::class,
+    AccountManagerLoginResultEvent::class,
     VirtualScreenEvent::class,
     FpsChangeEvent::class,
     ClientPlayerDataEvent::class,
@@ -102,7 +105,17 @@ val ALL_EVENT_CLASSES: Array<KClass<out Event>> = arrayOf(
     ServerConnectEvent::class,
     ServerPingedEvent::class,
     TargetChangeEvent::class,
-    GameModeChangeEvent::class
+    GameModeChangeEvent::class,
+    ComponentsUpdate::class,
+    ResourceReloadEvent::class,
+    ProxyAdditionResultEvent::class,
+    ProxyCheckResultEvent::class,
+    ScaleFactorChangeEvent::class,
+    DrawOutlinesEvent::class,
+    OverlayMessageEvent::class,
+    ScheduleInventoryActionEvent::class,
+    SpaceSeperatedNamesChangeEvent::class,
+    ClickGuiScaleChangeEvent::class
 )
 
 /**
